@@ -87,7 +87,20 @@ namespace minipr1
                 dataGridView4.Columns[i].HeaderCell.Value = (i + 1).ToString();
         }
 
-        private void BMI(int height, int weight)
+        private void FivethhDG()
+        {
+            dataGridView5.RowCount = D;
+            dataGridView5.ColumnCount = M;
+
+            dataGridView5.Rows[0].HeaderCell.Value = "Height";
+            dataGridView5.Rows[1].HeaderCell.Value = "Weight";
+            dataGridView5.Rows[2].HeaderCell.Value = "Glucose";
+            dataGridView5.Rows[3].HeaderCell.Value = "Diabetes";
+            for (int i = 0; i < M; i++)
+                dataGridView5.Columns[i].HeaderCell.Value = (i + 1).ToString();
+        }
+
+        private int BMI(int height, int weight)
         {
             double newHeight = height / 100;
             double BMI = weight / (newHeight * newHeight);
@@ -95,8 +108,10 @@ namespace minipr1
             {
                 Height.Add(height);
                 Weight.Add(weight);
+                return 1;
             }
-            
+            else
+                return 0;
         }
 
         private void startButtn_Click(object sender, EventArgs e)
@@ -133,7 +148,7 @@ namespace minipr1
                     dataGridView2.Rows[i].Cells[j].Value = mas[i, j].ToString();
                 }
             }
-           
+            FivethhDG();
         }
 
         private void DrawChart(List<double> xData, List<double> yData)
@@ -253,7 +268,7 @@ namespace minipr1
             for (int i = 0; i < Attitude.Count; i++)
             {
                 double glucoseLevel = Attitude[i] + GetRandomNoise(sigma);
-                if (glucoseLevel < 0)
+                   if (glucoseLevel < 0)
                 {
                     MessageBox.Show(glucoseLevel + " " + Attitude[i] + " " + (glucoseLevel- Attitude[i]));
                 }
@@ -293,14 +308,41 @@ namespace minipr1
                 newmas[2, i] = Glucose[i]; dataGridView3.Rows[2].Cells[i].Value = newmas[2, i].ToString(); 
                 newmas[3, i] = Diabetes[i]; dataGridView3.Rows[3].Cells[i].Value = newmas[3, i].ToString();
             }
+            // Очистите график перед отрисовкой новых данных
+            chart3.Series.Clear();
+
+            // Создайте новый объект серии данных и задайте тип графика
+            Series series = new Series("Glucose value");
+            series.ChartType = SeriesChartType.Line;
+            Series series1 = new Series("Threshold");
+            series1.ChartType = SeriesChartType.Line;
+            List<double> newGL = new List<double>();
+            Glucose.Sort();
+            // Заполните серию данных значениями из списков xData и yData
+            for (int i = 0; i < Attitude.Count; i++)
+            {
+                //MessageBox.Show("" + (i + 1) + (newmas[2, i]));
+                series1.Points.AddXY(i + 1, glucoseThreshold);
+                series.Points.AddXY(i + 1, Glucose[i]);
+            }
+            series.BorderWidth = 2;
+            series1.BorderWidth = 2;
+            // Добавьте серию данных на график
+            chart3.Series.Add(series);
+            chart3.Series.Add(series1);
+
+            // Подпишите ось X
+            chart3.ChartAreas[0].AxisX.Title = "Count of people";
+            chart3.ChartAreas[0].AxisX.TitleFont = new Font("Arial", 12, FontStyle.Bold);
+
+            // Подпишите ось Y
+            chart3.ChartAreas[0].AxisY.Title = "Glucose value";
+            chart3.ChartAreas[0].AxisY.TitleFont = new Font("Arial", 12, FontStyle.Bold);
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
-            for (int i = 0; i < M; i++)
-            {
-                BMI(mas[0, i], mas[1, i]);
-            }
+           
             FourthDG();
             double[,] newmas = new double[D, Height.Count];
            
@@ -311,6 +353,52 @@ namespace minipr1
                 newmas[2, i] = 0; dataGridView4.Rows[2].Cells[i].Value = newmas[2, i].ToString();
                 newmas[3, i] = 0; dataGridView4.Rows[3].Cells[i].Value = newmas[3, i].ToString();
             }
+
+           
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            
+            for (int j = 0; j < M; j++)
+            {
+                
+                dataGridView5.Rows[0].Cells[j].Value = mas[0, j].ToString();
+            }
+            for (int j = 0; j < M; j++)
+            {
+              
+                dataGridView5.Rows[1].Cells[j].Value = mas[1, j].ToString();
+            }
+            for (int i = 2; i < D; i++)
+            {
+                for (int j = 0; j < M; j++)
+                {
+                    mas[i, j] = 0;
+                    dataGridView5.Rows[i].Cells[j].Value = mas[i, j].ToString();
+                }
+            }
+            for (int i = 0; i < M; i++)
+            {
+                int temp = BMI(mas[0, i], mas[1, i]);
+                if(temp == 0) 
+                {
+                    dataGridView5.Rows[0].Cells[i].Value = "x";
+                    dataGridView5.Rows[1].Cells[i].Value = "x";
+                }
+
+            }
+            
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }
